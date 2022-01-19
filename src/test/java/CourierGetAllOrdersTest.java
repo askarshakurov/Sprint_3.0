@@ -1,23 +1,25 @@
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import io.restassured.response.ValidatableResponse;
+import org.junit.jupiter.api.DisplayName;
+
+import java.util.List;
 
 public class CourierGetAllOrdersTest {
     public OrderClient orderClient;
-    private int orderId;
 
     @Before
     public void setup() {
         orderClient = new OrderClient();
     }
 
-    @After
-    public void tearDown() {orderClient.orderCancel(orderId); }
-
     @Test
+    @DisplayName("Проверка, что в тело ответа возвращается список заказов")
     public void testOrdersResponseNotNull(){
-        Order order = Order.getFakeOrder();
-        orderId = orderClient.orderCreateGivesTrack(order);
-        orderClient.viewOrders(orderId);
+        ValidatableResponse response = orderClient.viewOrders();
+        List<Object> orders = response.extract().jsonPath().getList("orders");
+
+        Assert.assertFalse(orders.isEmpty());
     }
 }

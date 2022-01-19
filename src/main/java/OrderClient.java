@@ -1,11 +1,8 @@
-
 import io.qameta.allure.Step;
-import org.apache.commons.lang3.ObjectUtils;
-
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.*;
-import static org.hamcrest.Matchers.*;
+import io.restassured.response.ValidatableResponse;
 
 public class OrderClient extends RestAssuredClient {
 
@@ -19,7 +16,6 @@ public class OrderClient extends RestAssuredClient {
                 .when()
                 .post(ORDER_PATH)
                 .then()
-                .log().all()
                 .assertThat()
                 .statusCode(SC_CREATED)
                 .extract()
@@ -34,7 +30,6 @@ public class OrderClient extends RestAssuredClient {
                 .when()
                 .post(ORDER_PATH)
                 .then()
-                .log().all()
                 .assertThat()
                 .statusCode(SC_CREATED)
                 .extract()
@@ -55,16 +50,11 @@ public class OrderClient extends RestAssuredClient {
     }
 
     @Step("view all orders")
-    public Integer viewOrders(int orderId) {
+    public ValidatableResponse viewOrders() {
         return given()
                 .spec(getBaseSpec())
                 .when()
-                .get(ORDER_PATH+ "track?t=" + orderId)
-                .then()
-                .assertThat()
-                .statusCode(SC_OK)
-                .body("order.size()", greaterThan(0))
-                .extract()
-                .statusCode();
+                .get(ORDER_PATH)
+                .then();
     }
 }

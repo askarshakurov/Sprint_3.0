@@ -28,7 +28,6 @@ public class CourierClient extends RestAssuredClient{
                 .when()
                 .post(COURIER_PATH)
                 .then()
-                .log().all()
                 .assertThat()
                 .statusCode(SC_CREATED)
                 .extract()
@@ -148,7 +147,7 @@ public class CourierClient extends RestAssuredClient{
     }
 
     @Step("Login without required fields of courier data")
-    public Integer loginWithWrondCredetialsReturnsCode (CourierCredentials courierCredentials) {
+    public Integer loginWithWrondCredentialsReturnsCode (CourierCredentials courierCredentials) {
         return given()
                 .spec(getBaseSpec())
                 .body(courierCredentials)

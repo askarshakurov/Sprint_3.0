@@ -41,7 +41,6 @@ public class CourierOrderParametrizedTest  {
 
     @Test
     public void testCreateOrderWithDifferentColours() {
-        Order order = Order.getFakeOrder();
         int actualCode = orderClient.orderCreateGivesCode(order);
         orderId = orderClient.orderCreateGivesTrack(order);
 

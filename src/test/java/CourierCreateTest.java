@@ -18,12 +18,16 @@ public class CourierCreateTest {
     }
 
     @After
-    public void tearDown() {courierClient.delete(courierId); }
+    public void tearDown() {
+        if (courierId != 0) {
+            courierClient.delete(courierId);
+        }
+    }
 
     @Test
     @DisplayName("Курьера можно создать/Успешный запрос возвращает ok: true;\n")
     public void testCourierIsCreating() {
-        Courier courier = Courier.getRandom();
+        Courier courier = Courier.getRandomCourierWithAllCredentials();
 
         boolean isCreated = courierClient.create(courier);
         assertTrue("Courier is not created", isCreated);
@@ -34,7 +38,7 @@ public class CourierCreateTest {
     @Test
     @DisplayName("Запрос возвращает правильный код ответа")
     public void testCourierCodeOfCreatingCheck() {
-        Courier courier = Courier.getRandom();
+        Courier courier = Courier.getRandomCourierWithAllCredentials();
 
         int code = courierClient.createCode(courier);
         assertThat("Courier ID is incorrect", code, is(201));
@@ -45,7 +49,7 @@ public class CourierCreateTest {
     @Test
     @DisplayName("Если создать пользователя с логином, который уже есть, возвращается ошибка")
     public void testCourierCreateExistedCheckCode() {
-        Courier fistCreated = Courier.getRandom();
+        Courier fistCreated = Courier.getRandomCourierWithAllCredentials();
         Courier secondCreated = new Courier(fistCreated.login, fistCreated.password, fistCreated.firstname);
         courierClient.create(fistCreated);
         courierId = courierClient.login(CourierCredentials.getCourierCredentials(fistCreated));
@@ -57,12 +61,11 @@ public class CourierCreateTest {
     @Test
     @DisplayName("Нельзя создать двух одинаковых курьеров;")
     public void testCourierCreateExistedCheckErrorText() {
-        Courier fistCreated = Courier.getRandom();
+        Courier fistCreated = Courier.getRandomCourierWithAllCredentials();
         Courier secondCreated = new Courier(fistCreated.login, fistCreated.password, fistCreated.firstname);
         courierClient.create(fistCreated);
         courierId = courierClient.login(CourierCredentials.getCourierCredentials(fistCreated));
 
-        //Текст не сходится с документацией,поэтому он будет падать.
         String errorText = courierClient.recreateErrorText(secondCreated);
         assertThat("Courier ID is incorrect", errorText, is("Этот логин уже используется"));
     }
@@ -70,7 +73,7 @@ public class CourierCreateTest {
     @Test
     @DisplayName("Чтобы создать курьера, нужно передать в ручку все обязательные поля")
     public void testCreateCourierWithoutFirstName(){
-        Courier courier = Courier.getRandomNoName();
+        Courier courier = Courier.getRandomCourierWithNoName();
         boolean isCreated = courierClient.create(courier);
         assertTrue("Courier is not created", isCreated);
 
@@ -81,15 +84,9 @@ public class CourierCreateTest {
      @Test
      @DisplayName("Если одного из полей нет, запрос возвращает ошибку")
     public void testCreateWithoutPassword() {
-        Courier courier = new Courier("loginChecker123");
+        Courier courier = Courier.getRandomCourierWithLoginOnly();
         Integer errorCode = courierClient.createWithoutPassword(courier);
         assertThat("Courier ID is incorrect", errorCode, is(400));
-
-         //Это был единственный тест из всех,где не нужно было удалять ID курьера после создания,
-         // поэтому сделал костыль из создания и удаления курьера чтобы тест не падал
-        Courier courierForDeleting = Courier.getRandom();
-        courierClient.create(courierForDeleting);
-        courierId = courierClient.login(CourierCredentials.getCourierCredentials(courierForDeleting));
 
      }
 }
